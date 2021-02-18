@@ -1,35 +1,55 @@
+
 import diff from "jest-diff";
+import React, {useRef,useState, useEffect} from 'react';
 
 function App() {
-  return (<div>
-    <p>Hello</p>
-    <NumberBlock time = {3} unit = 'days'/>
-    </div>);
-}
- 
-const NumberBlock = (props) => {
-  //I want to get the current date and the target date
-  //subtract one from the other
-  //do math to tell how many months, days, hour, mins, second are there
-  const now = new Date().getTime();
   
-  const destination = new Date("March 19, 2021 00:00").getTime();
-  const difference = (destination - now)/1000;
-  const monthTime = Math.floor(difference / (60 * 60 * 24 ))%12;
-  const dayTime = Math.floor(difference / (60 * 60 * 24));
-  const hourTime = Math.floor(difference / (3600)) % 24;
-  const minTime = Math.floor(difference / 60) % 60;
-  const secTime = Math.floor(difference % 60);
 
-  console.log(now.getHour());
-  console.log(destination.getHour());
-  console.log(monthTime);
-  console.log(dayTime);
-  console.log(hourTime);
-  console.log(minTime);
-  console.log(secTime);
-  // console.log(now);
-  // console.log(difference);
+  const [dayTime,setDayTime] = useState(0);
+  const [hourTime,setHourTime] = useState(0);
+  const [minTime,setMinTime] = useState(0);
+  const [secTime,setSecTime] = useState(0);
+  let interval = useRef();
+  const startTimer = () => {
+    
+    const destination = new Date("February 18, 2021 14:56").getTime();
+    const now = new Date().getTime();
+    const difference = (destination - now)/1000;
+    interval = setInterval(() => {
+      
+      if(difference<0){
+        console.log("hi")
+        clearInterval(interval);
+      }
+      else{
+        setDayTime(Math.floor(difference / (60 * 60 * 24)));
+        setHourTime( Math.floor(difference / (3600)) % 24);
+        setMinTime(  Math.floor(difference / 60) % 60);
+        setSecTime(  Math.floor(difference % 60));
+      }
+    }, 1000);
+  }
+
+  useEffect(()=>{
+    startTimer();
+    return ()=> clearInterval(interval);
+  });
+  
+  return (
+    <div>
+      
+      <NumberBlock time = {dayTime} unit = 'day'/>
+      <NumberBlock time = {hourTime} unit = 'hour'/>
+      <NumberBlock time = {minTime} unit = 'min'/>
+      <NumberBlock time = {secTime} unit = 'sec'/>
+    </div>
+    );
+}
+
+
+const NumberBlock = (props) => {
+  
+ 
   const {time,unit} = props;
   return <div>
     <div>{time}</div>
